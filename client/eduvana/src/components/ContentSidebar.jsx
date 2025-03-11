@@ -6,7 +6,7 @@ function ContentSidebar({ selectedType, onTypeChange }) {
     { id: "video", label: "Video Lesson" },
     { id: "pdf", label: "PDF Notes" },
     { id: "quiz", label: "Quiz" },
-    { id: "flashcards", label: "Flashcards" } // Added Flashcards option
+    
   ];
 
   return (

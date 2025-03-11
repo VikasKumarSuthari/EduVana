@@ -25,6 +25,20 @@ function HomePage() {
       image: "/src/assets/images/progress.jpeg", 
       description: "Track your learning journey and achievements",
       path: "/progress"
+    },
+    { 
+      id: "collaborative-learning", 
+      title: "Collaborative Learning", 
+      image: "/src/assets/images/bb.jpg", 
+      description: "Join study groups and collaborate with others",
+      path: "/collaborative-learning"
+    },
+    { 
+      id: "learn-ai", 
+      title: "AI Based Learning", 
+      image: "/src/assets/images/ll.jpg", 
+      description: "Explore AI-powered educational resources and tools",
+      path: "/learn-ai"
     }
   ];
 

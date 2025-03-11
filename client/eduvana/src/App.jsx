@@ -10,6 +10,9 @@ import Progress from "./pages/Progress";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import "./App.css";
+import CollaborativeLearning from "./pages/CollaborativeLearning";
+import LearnAI from "./pages/LearnAI";
+
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -87,6 +90,8 @@ function App() {
 
             {/* Catch-all Redirect */}
             <Route path="*" element={<Navigate to={isAuthenticated ? "/" : "/login"} />} />
+            <Route path="/collaborative-learning" element={<CollaborativeLearning />} />
+            <Route path="/learn-ai" element={<LearnAI />} />
           </Routes>
         </div>
       </div>

@@ -1,12 +1,12 @@
 import { Link } from 'react-router-dom'
-import TesseractLogo from '../assets/TesseractLogo.jsx'
+// import TesseractLogo from '../assets/TesseractLogo.jsx'
 
 const Navbar = () => {
   return (
     <nav className="navbar">
       <div className="navbar-container">
         <Link to="/" className="logo-container">
-          <TesseractLogo />
+          {/* <TesseractLogo /> */}
           <span className="logo-text">EDUVANA</span>
           <span className="logo-subtext">LEARNING</span>
         </Link>
