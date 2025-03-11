@@ -7,7 +7,13 @@ function VideoPlayer({ videoUrl }) {
     <div className="video-player">
       <h3>Video Lesson</h3>
       <div className="video-container">
-        <ReactPlayer url={videoUrl} controls width="100%" height="auto" />
+        <ReactPlayer 
+          url={videoUrl} 
+          controls 
+          className="react-player"
+          width="100%" 
+          height="auto" 
+        />
       </div>
     </div>
   );

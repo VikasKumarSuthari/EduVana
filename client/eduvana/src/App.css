@@ -97,3 +97,7 @@
 }
 
 /* HomePage.css */
+html, body {
+  height: auto;
+  overflow: auto; /* Ensure scrolling is enabled */
+}

@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import './InterviewBot.css';
+import './Interview.css';
 
-const InterviewBot = () => {
+const Interview = () => {
   const [selectedSubject, setSelectedSubject] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
@@ -50,7 +50,7 @@ const InterviewBot = () => {
         return;
       }
 
-      const response = await axios.get('http://localhost:5000/api/interview/session/${sessionId}', {
+      const response = await axios.get(`http://localhost:5000/api/interview/session/${sessionId}`, {
         headers: {
           'x-auth-token': token
         }
@@ -294,4 +294,4 @@ const InterviewBot = () => {
   );
 };
 
-export default InterviewBot;
+export default Interview;
