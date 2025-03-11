@@ -1,0 +1,22 @@
+.topic-content-page {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+  
+  .content-layout {
+    display: flex;
+    margin-top: 20px;
+    min-height: 600px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  
+  .content-display {
+    flex: 1;
+    padding: 20px;
+  }
+  
+
+  

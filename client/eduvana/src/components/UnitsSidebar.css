@@ -1,0 +1,37 @@
+/* UnitsSidebar.css */
+.units-sidebar {
+    width: 250px;
+    background-color: #f5f5f5;
+    border-right: 1px solid #e0e0e0;
+    padding: 20px;
+  }
+  
+  .units-sidebar h2 {
+    margin-top: 0;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #e0e0e0;
+  }
+  
+  .units-sidebar ul {
+    list-style: none;
+    padding: 0;
+  }
+  
+  .units-sidebar li {
+    padding: 12px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-bottom: 5px;
+    transition: background-color 0.2s;
+  }
+  
+  .units-sidebar li:hover {
+    background-color: #e8e8e8;
+  }
+  
+  .units-sidebar li.selected {
+    background-color: #e0e0ff;
+    color: #3030a0;
+    font-weight: bold;
+  }
+  

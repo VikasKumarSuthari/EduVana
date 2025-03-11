@@ -40,3 +40,60 @@
 .read-the-docs {
   color: #888;
 }
+
+
+.app {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+.header {
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.main-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.welcome {
+  padding: 2rem;
+  text-align: center;
+  color: #666;
+}
+
+.unit-content {
+  padding: 1.5rem;
+  background-color: white;
+  border-radius: 4px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+@media (min-width: 768px) {
+  .main-content {
+    flex-direction: row;
+    gap: 2rem;
+  }
+  
+  .sidebar {
+    width: 300px;
+  }
+}
+
+.app {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.content-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+}
+
+/* HomePage.css */
