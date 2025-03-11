@@ -4,6 +4,7 @@ import HomePage from "./pages/HomePage";
 import SubjectPage from "./pages/SubjectPage";
 import TopicContent from "./pages/TopicContent";
 import TesseractLearning from "./pages/TesseractLearning";
+import AIAssistant from "./pages/AIAssisant.jsx";
 import "./App.css";
 
 function App() {
@@ -17,6 +18,7 @@ function App() {
             <Route path="/subject/:subjectId" element={<SubjectPage />} />
             <Route path="/subject/:subjectId/unit/:unitId/topic/:topicId" element={<TopicContent />} />
             <Route path="/learning" element={<TesseractLearning />} />
+            <Route path="/ai-assistant" element={<AIAssistant />} />
           </Routes>
         </div>
       </div>

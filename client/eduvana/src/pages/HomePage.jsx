@@ -18,20 +18,25 @@ function HomePage() {
   }, []);
 
   return (
-    <div className="home-page">
-      <h1>My Learning Dashboard</h1>
-      <div className="subject-cards">
+    <div className="homepage-container">
+      <h1 className="dashboard-title">My Learning Dashboard</h1>
+      
+      <div className="subjects-grid">
         {subjects.map((subject) => (
-          <Link 
-            to={`/subject/${subject.id}`} 
-            key={subject.id} 
-            className="subject-card"
-          >
-            <img src={subject.image} alt={subject.title} />
-            <h3>{subject.title}</h3>
+          <Link to={`/subject/${subject.id}`} key={subject.id} className="subject-card">
+            <img src={subject.image} alt={subject.title} className="subject-image" />
+            <h2 className="subject-title">{subject.title}</h2>
           </Link>
         ))}
       </div>
+
+      {/* AI Assistant Chatbot Button */}
+      <Link to="/ai-assistant" className="ai-assistant-button">
+        <div className="robot-icon">
+          <img src="src/assets/robot.png" alt="AI Assistant" />
+        </div>
+        <span className="assistant-tooltip">Chat with AI</span>
+      </Link>
     </div>
   );
 }
