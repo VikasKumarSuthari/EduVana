@@ -1,99 +1,81 @@
-/* Existing HomePage styles */
-.homepage-container {
+.home-page {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+  
+
+  /* HomePage.css */
+.home-page {
   max-width: 1200px;
   margin: 0 auto;
   padding: 20px;
-  position: relative;
 }
 
-.dashboard-title {
+.home-page h1 {
   text-align: center;
-  margin-bottom: 30px;
+  margin-bottom: 40px;
   color: #333;
 }
 
-.subjects-grid {
+.dashboard-cards {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 30px;
 }
 
-.subject-card {
-  background-color: #fff;
-  border-radius: 8px;
-  overflow: hidden;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s ease;
-  text-decoration: none;
-  color: inherit;
-}
-
-.subject-card:hover {
-  transform: translateY(-5px);
-}
-
-.subject-image {
-  width: 100%;
-  height: 160px;
-  object-fit: cover;
-}
-
-.subject-title {
-  padding: 15px;
-  text-align: center;
-  font-size: 1.2rem;
-}
-
-/* AI Assistant Button Styles */
-.ai-assistant-button {
-  position: fixed;
-  bottom: 30px;
-  right: 30px;
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  background-color: #4285f4;
+.dashboard-card {
   display: flex;
-  justify-content: center;
-  align-items: center;
-  cursor: pointer;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-  transition: all 0.3s ease;
-  z-index: 1000;
+  flex-direction: column;
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
   text-decoration: none;
-}
-
-.ai-assistant-button:hover {
-  transform: scale(1.1);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
-}
-
-.robot-icon {
-  width: 35px;
-  height: 35px;
-}
-
-.robot-icon img {
-  width: 100%;
+  color: #333;
+  transition: transform 0.3s, box-shadow 0.3s;
   height: 100%;
 }
 
-.assistant-tooltip {
-  position: absolute;
-  bottom: 70px;
-  right: 0;
-  background-color: #333;
-  color: white;
-  padding: 8px 12px;
-  border-radius: 6px;
-  font-size: 14px;
-  white-space: nowrap;
-  opacity: 0;
-  visibility: hidden;
-  transition: all 0.3s ease;
+.dashboard-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
 }
 
-.ai-assistant-button:hover .assistant-tooltip {
-  opacity: 1;
-  visibility: visible;
+.card-image {
+  position: relative;
+  height: 180px;
+  overflow: hidden;
+}
+
+.card-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s;
+}
+
+.dashboard-card:hover .card-image img {
+  transform: scale(1.05);
+}
+
+.card-content {
+  padding: 20px;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.card-content h2 {
+  margin-top: 0;
+  margin-bottom: 15px;
+  color: #2c3e50;
+  font-size: 1.5rem;
+}
+
+.card-content p {
+  margin-bottom: 0;
+  color: #666;
+  line-height: 1.5;
 }

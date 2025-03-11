@@ -1,22 +1,102 @@
-.topic-content-page {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 20px;
-  }
-  
-  .content-layout {
-    display: flex;
-    margin-top: 20px;
-    min-height: 600px;
-    border: 1px solid #e0e0e0;
-    border-radius: 8px;
-    overflow: hidden;
-  }
-  
-  .content-display {
-    flex: 1;
-    padding: 20px;
-  }
-  
+/* Ensure the body and html take full height */
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden; /* Prevent scrollbars on the body */
+}
 
+/* Root container - typically your app's main div */
+#root, .app {
+  height: 100%;
+  width: 100%;
+}
+
+/* Make the topic content page take full screen */
+.topic-content-page {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Navbar styles */
+.navbar {
+  width: 100%;
+  z-index: 10;
+  /* Add your navbar styling here */
+}
+
+/* Make the content layout take full width & height */
+.content-layout {
+  display: flex;
+  flex: 1;
+  width: 100%;
+  height: calc(100% - 60px); /* Adjust based on your navbar height */
+  border: none;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Sidebar styling */
+.sidebar {
+  width: 250px; /* Adjust based on your sidebar width */
+  height: 100%;
+  overflow-y: auto;
+  position: relative;
+  z-index: 5;
+  /* Add your sidebar styling here */
+}
+
+/* Make the content display occupy full space from sidebar to edge */
+.content-display {
+  flex: 1;
+  height: 100%;
+  padding: 20px;
+  overflow-y: auto; /* Scroll if content overflows */
+  background-color: #f9f9f9; /* Optional background color */
+}
+
+/* For topic content that needs to fill the entire space */
+.topic-content {
+  width: 100%;
+  height: 100%;
+}
+
+/* For embedded content like videos or PDFs */
+.embedded-content {
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+/* For resources sidebar (if needed) */
+.resources-sidebar {
+  width: 200px;
+  height: 100%;
+  overflow-y: auto;
+  border-left: 1px solid #eee;
+}
+
+/* Optional: Add some responsive adjustments */
+@media (max-width: 768px) {
+  .content-layout {
+    flex-direction: column;
+  }
   
+  .sidebar {
+    width: 100%;
+    height: auto;
+    border-right: none;
+    border-bottom: 1px solid #eee;
+  }
+  
+  .resources-sidebar {
+    width: 100%;
+    height: auto;
+    border-left: none;
+    border-top: 1px solid #eee;
+  }
+}

@@ -1,4 +1,5 @@
 import React from "react";
+import ReactPlayer from "react-player";
 import "./VideoPlayer.css";
 
 function VideoPlayer({ videoUrl }) {
@@ -6,11 +7,7 @@ function VideoPlayer({ videoUrl }) {
     <div className="video-player">
       <h3>Video Lesson</h3>
       <div className="video-container">
-        {/* Replace with actual video player component */}
-        <div className="placeholder-video">
-          <p>Video Player</p>
-          <p>URL: {videoUrl}</p>
-        </div>
+        <ReactPlayer url={videoUrl} controls width="100%" height="auto" />
       </div>
     </div>
   );

@@ -4,8 +4,9 @@ import OpenAI from "openai";
 import "./AIAssistant.css";
 
 const openai = new OpenAI({
-  apiKey: process.env.REACT_APP_OPENAI_API_KEY,
+  apiKey: import.meta.env.REACT_APP_OPENAI_API_KEY,
 });
+
 
 function AIAssistant() {
   const [messages, setMessages] = useState([

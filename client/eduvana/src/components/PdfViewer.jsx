@@ -6,11 +6,12 @@ function PdfViewer({ pdfUrl }) {
     <div className="pdf-viewer">
       <h3>PDF Notes</h3>
       <div className="pdf-container">
-        {/* Replace with actual PDF viewer component */}
-        <div className="placeholder-pdf">
-          <p>PDF Viewer</p>
-          <p>URL: {pdfUrl}</p>
-        </div>
+        <iframe 
+          src={pdfUrl} 
+          width="100%" 
+          height="600px"
+          title="PDF Viewer"
+        ></iframe>
       </div>
     </div>
   );

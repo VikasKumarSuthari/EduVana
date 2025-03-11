@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom"; // ✅ Import useParams
+import { useParams } from "react-router-dom"; 
 import ContentSidebar from "../components/ContentSidebar";
 import VideoPlayer from "../components/VideoPlayer";
 import PdfViewer from "../components/PdfViewer";
@@ -7,7 +7,7 @@ import Quiz from "../components/Quiz";
 import "./TopicContent.css";
 
 function TopicContent() {
-  const { topicId } = useParams(); // ✅ Extract topicId
+  const { topicId } = useParams();
 
   const [topic, setTopic] = useState(null);
   const [contentType, setContentType] = useState("video");
@@ -21,7 +21,7 @@ function TopicContent() {
           title: `Topic ${topicId}`,
           contents: {
             video: { url: "https://www.youtube.com/watch?v=w7ejDZ8SWv8" },
-            pdf: { url: "https://example.com/notes.pdf" },
+            pdf: { url: "https://www.tutorialspoint.com/html/html_tutorial.pdf" },
             quiz: { 
               questions: [
                 { id: 1, question: "Sample question 1?", options: ["A", "B", "C", "D"], answer: "B" },
@@ -38,7 +38,7 @@ function TopicContent() {
       }
     };
 
-    if (topicId) fetchTopicData(); // ✅ Only fetch if topicId exists
+    if (topicId) fetchTopicData();
   }, [topicId, contentType]);
 
   const handleContentTypeChange = (type) => {
