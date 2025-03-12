@@ -4,6 +4,7 @@ import ContentSidebar from "../components/ContentSidebar";
 import VideoPlayer from "../components/VideoPlayer";
 import PdfViewer from "../components/PdfViewer";
 import Quiz from "../components/Quiz";
+import AudioBook from "../components/AudioBook"; // Import AudioBook
 import "./TopicContent.css";
 
 function TopicContent() {
@@ -23,6 +24,7 @@ function TopicContent() {
           contents: {
             video: { url: "https://www.youtube.com/watch?v=w7ejDZ8SWv8" },
             pdf: { url: "https://www.tutorialspoint.com/html/html_tutorial.pdf" },
+            audiobook: { url: "http://localhost:8502" }, // Example for AudioBook
           }
         };
         
@@ -57,6 +59,7 @@ function TopicContent() {
           {contentType === "video" && <VideoPlayer videoUrl={content?.url} />}
           {contentType === "pdf" && <PdfViewer pdfUrl={content?.url} />}
           {contentType === "quiz" && <Quiz topicId={topicId} topicName={topic.title} />}
+          {contentType === "audiobook" && <AudioBook />} {/* Integrated AudioBook */}
         </div>
       </div>
     </div>

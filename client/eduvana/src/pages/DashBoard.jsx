@@ -17,7 +17,7 @@ function Dashboard() {
         const response = await fetch(`${API_URL}/subjects`);
         const data = await response.json();
         
-        console.log("Fetched subjects:", data); // ✅ Debugging log
+        console.log("Fetched subjects:", data); 
     
         if (!Array.isArray(data)) {
           throw new Error("Invalid data format from API");

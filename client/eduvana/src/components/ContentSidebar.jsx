@@ -6,7 +6,7 @@ function ContentSidebar({ selectedType, onTypeChange }) {
     { id: "video", label: "Video Lesson" },
     { id: "pdf", label: "PDF Notes" },
     { id: "quiz", label: "Quiz" },
-    
+    { id: "audiobook", label: "AudioBook" }, // Added AudioBook option
   ];
 
   return (
@@ -14,7 +14,7 @@ function ContentSidebar({ selectedType, onTypeChange }) {
       <h2>Content</h2>
       <ul>
         {contentTypes.map((type) => (
-          <li 
+          <li
             key={type.id}
             className={type.id === selectedType ? "selected" : ""}
             onClick={() => onTypeChange(type.id)}

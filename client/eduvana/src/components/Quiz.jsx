@@ -13,7 +13,7 @@ function Quiz() {
   useEffect(() => {
     const fetchQuiz = async () => {
       try {
-        const response = await axios.post("http://localhost:5001/api/generate-quiz", { topic: "General Knowledge" });
+        const response = await axios.post("http://192.168.0.129:5000/api/generate-quiz", { topic: "General Knowledge" });
         setQuestions(response.data.questions);
       } catch (error) {
         console.error("Error generating quiz:", error);

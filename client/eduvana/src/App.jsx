@@ -14,6 +14,7 @@ import CollaborativeLearning from "./pages/CollaborativeLearning";
 import LearnAI from "./pages/LearnAI";
 import SummerizerDashboard from "./pages/SummerizerDashboard";
 import Tesseract from "./pages/Tesseract";
+import AudioBook from "./components/AudioBook";
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState(null);
@@ -94,6 +95,7 @@ function App() {
             <Route path="/learn-ai" element={<LearnAI />} />
              <Route path="/summary" element={<SummerizerDashboard />} />
              <Route path="/hasthavaani" element={<Tesseract />} />
+             <Route path="/audio" element={<AudioBook />} />
           </Routes>
         </div>
       </div>

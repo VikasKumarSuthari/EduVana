@@ -33,7 +33,7 @@ function LearnAI() {
       let response;
 
       if (type === "content") {
-        response = await axios.post("http://localhost:5000/api/generate-contentt", { topic, type });
+        response = await axios.post("http://192.168.0.129:5000/api/generate-content", { topic, type });
         setContent(response.data.data.text || null);
       } else if (type === "flashcards") {
         response = await axios.post("http://localhost:5000/api/generate-content", { topic, type });
