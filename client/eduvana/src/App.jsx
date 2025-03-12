@@ -12,8 +12,8 @@ import Signup from "./pages/Signup";
 import "./App.css";
 import CollaborativeLearning from "./pages/CollaborativeLearning";
 import LearnAI from "./pages/LearnAI";
-
-
+import SummerizerDashboard from "./pages/SummerizerDashboard";
+import Tesseract from "./pages/Tesseract";
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState(null);
@@ -92,6 +92,8 @@ function App() {
             <Route path="*" element={<Navigate to={isAuthenticated ? "/" : "/login"} />} />
             <Route path="/collaborative-learning" element={<CollaborativeLearning />} />
             <Route path="/learn-ai" element={<LearnAI />} />
+             <Route path="/summary" element={<SummerizerDashboard />} />
+             <Route path="/hasthavaani" element={<Tesseract />} />
           </Routes>
         </div>
       </div>

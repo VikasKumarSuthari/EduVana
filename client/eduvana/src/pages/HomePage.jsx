@@ -39,6 +39,20 @@ function HomePage() {
       image: "/src/assets/images/ll.jpg", 
       description: "Explore AI-powered educational resources and tools",
       path: "/learn-ai"
+    },
+    { 
+      id: "Text Summarizer", 
+      title: "Text Summarizer", 
+      image: "/src/assets/images/textsummarizer.png", 
+      description: "Explore AI-powered educational resources and tools",
+      path: "/summary"
+    },
+    { 
+      id: "Hastha Vaani", 
+      title: "Hastha Vaani", 
+      image: "/src/assets/images/hasthavaasi.jpg", 
+      description: "Explore AI-powered educational resources and tools",
+      path: "/hasthavaani"
     }
   ];
 

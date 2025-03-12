@@ -1,12 +1,8 @@
 import React, { useState } from "react";
 import axios from "axios";
 import Flashcard from "./Flashcard";
-import { GoogleGenerativeAI } from "@google/generative-ai";
-import MindMap from "./MindMap"; // Import the new MindMap component
+import MindMap from "./MindMap"; // Import the MindMap component
 import "./LearnAI.css";
-
-// Initialize Google Gemini API
-const genAI = new GoogleGenerativeAI("AIzaSyDVDNBDVaY6QFXpOqh4wXySZf0-ATjQ0Sc"); // Replace with your API key
 
 function LearnAI() {
   const [topic, setTopic] = useState("");
@@ -30,19 +26,20 @@ function LearnAI() {
     setError("");
 
     try {
-      let response;
+      const response = await axios.post("http://localhost:5000/api/generate-content", {
+        topic,
+        type,
+      });
+
+      const data = response.data.data;
 
       if (type === "content") {
-        const model = genAI.getGenerativeModel({ model: "gemini-pro" });
-        response = await model.generateContent(`Provide educational content about ${topic}`);
-        const textResponse = response.response ? response.response.text() : "No content generated.";
-        setContent(textResponse);
+        
+        setContent(data.text || null);
       } else if (type === "flashcards") {
-        response = await axios.post("http://localhost:5000/api/generate-content", { topic, type });
-        setFlashcards(response.data.data.flashcards || []);
+        setFlashcards(data.flashcards || []);
       } else if (type === "mindmap") {
-        response = await axios.post("http://localhost:5000/api/generate-content", { topic, type });
-        setMindmap(response.data.data.mindmap || null);
+        setMindmap(data.mindmap || null);
       }
     } catch (error) {
       console.error("Error generating content:", error);
