@@ -1,8 +1,8 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState } from "react";
 import axios from "axios";
 import Flashcard from "./Flashcard";
-import { DiagramComponent, LayoutOrientation } from "@syncfusion/ej2-react-diagrams";
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import MindMap from "./MindMap"; // Import the new MindMap component
 import "./LearnAI.css";
 
 // Initialize Google Gemini API
@@ -16,7 +16,6 @@ function LearnAI() {
   const [mindmap, setMindmap] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const diagramInstance = useRef(null);
 
   const handleGenerateContent = async () => {
     if (!topic.trim()) {
@@ -36,7 +35,8 @@ function LearnAI() {
       if (type === "content") {
         const model = genAI.getGenerativeModel({ model: "gemini-pro" });
         response = await model.generateContent(`Provide educational content about ${topic}`);
-        setContent(response.response.text());
+        const textResponse = response.response ? response.response.text() : "No content generated.";
+        setContent(textResponse);
       } else if (type === "flashcards") {
         response = await axios.post("http://localhost:5000/api/generate-content", { topic, type });
         setFlashcards(response.data.data.flashcards || []);
@@ -51,47 +51,6 @@ function LearnAI() {
 
     setLoading(false);
   };
-
-  // Convert Mind Map data to Syncfusion Diagram Nodes
-  const generateDiagramNodes = () => {
-    if (!mindmap) return { nodes: [], connectors: [] };
-
-    let nodes = [
-      { id: "main", annotations: [{ content: mindmap.main_topic }] }
-    ];
-    let connectors = [];
-
-    mindmap.subtopics.forEach((subtopic, index) => {
-      const subId = `sub-${index}`;
-      nodes.push({
-        id: subId,
-        annotations: [{ content: subtopic.title }],
-      });
-
-      connectors.push({ id: `edge-${index}`, sourceID: "main", targetID: subId });
-
-      subtopic.details.forEach((detail, detailIndex) => {
-        const detailId = `detail-${index}-${detailIndex}`;
-        nodes.push({
-          id: detailId,
-          annotations: [{ content: detail }],
-        });
-
-        connectors.push({ id: `edge-detail-${index}-${detailIndex}`, sourceID: subId, targetID: detailId });
-      });
-    });
-
-    return { nodes, connectors };
-  };
-
-  const diagramData = generateDiagramNodes();
-
-  // Fit diagram to screen without scrolling
-  useEffect(() => {
-    if (diagramInstance.current) {
-      diagramInstance.current.fitToPage({ mode: "Width" });
-    }
-  }, [mindmap]);
 
   return (
     <div className="learn-ai-page">
@@ -136,36 +95,9 @@ function LearnAI() {
       )}
 
       {mindmap && type === "mindmap" && (
-        <div className="mindmap-container" style={{ width: "100vw", height: "100vh", overflow: "hidden" }}>
+        <div className="mindmap-container">
           <h2>Mind Map on {topic}</h2>
-          <DiagramComponent
-            id="mindmap-diagram"
-            width={"100vw"}
-            height={"90vh"}
-            ref={diagramInstance}
-            nodes={diagramData.nodes}
-            connectors={diagramData.connectors}
-            layout={{
-              type: "HierarchicalTree",
-              orientation: LayoutOrientation.TopToBottom,
-            }}
-            getNodeDefaults={(node) => {
-              node.width = 150;
-              node.height = 50;
-              node.style = { fill: "#f8f9fa", strokeColor: "#333" };
-              return node;
-            }}
-            getConnectorDefaults={(connector) => {
-              connector.type = "Straight";
-              connector.style = { strokeColor: "#666", strokeWidth: 2 };
-              return connector;
-            }}
-            created={() => {
-              if (diagramInstance.current) {
-                diagramInstance.current.fitToPage({ mode: "Width" });
-              }
-            }}
-          />
+          <MindMap mindmap={mindmap} />
         </div>
       )}
     </div>

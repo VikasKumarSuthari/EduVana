@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-
 import ContentSidebar from "../components/ContentSidebar";
 import VideoPlayer from "../components/VideoPlayer";
 import PdfViewer from "../components/PdfViewer";
@@ -24,7 +23,6 @@ function TopicContent() {
           contents: {
             video: { url: "https://www.youtube.com/watch?v=w7ejDZ8SWv8" },
             pdf: { url: "https://www.tutorialspoint.com/html/html_tutorial.pdf" },
-            // We're no longer including quiz data here as it will be fetched by the Quiz component
           }
         };
         
@@ -58,7 +56,7 @@ function TopicContent() {
         <div className="content-display">
           {contentType === "video" && <VideoPlayer videoUrl={content?.url} />}
           {contentType === "pdf" && <PdfViewer pdfUrl={content?.url} />}
-          {contentType === "quiz" && <Quiz topicaName={'React'} />}
+          {contentType === "quiz" && <Quiz topicId={topicId} topicName={topic.title} />}
         </div>
       </div>
     </div>

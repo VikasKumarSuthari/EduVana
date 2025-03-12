@@ -4,17 +4,45 @@ import "./Dashboard.css";
 
 function Dashboard() {
   const [subjects, setSubjects] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   
-  // Fetch actual subjects from API
+  const API_URL = 'http://localhost:5001/api';
+
   useEffect(() => {
-    // Replace with actual API call
-    const mockSubjects = [
-      { id: 1, title: "Cloud Computing", image: "/src/assets/cc.jpeg", progress: 65 },
-      { id: 2, title: "Database Management Systems", image: "/src/assets/dbms.jpeg", progress: 42 },
-      { id: 3, title: "Operating Systems", image: "/src/assets/os.jpeg", progress: 78 },
-    ];
-    setSubjects(mockSubjects);
+    // Fetch subjects from the backend API
+    const fetchSubjects = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch(`${API_URL}/subjects`);
+        const data = await response.json();
+        
+        console.log("Fetched subjects:", data); // ✅ Debugging log
+    
+        if (!Array.isArray(data)) {
+          throw new Error("Invalid data format from API");
+        }
+    
+        setSubjects(data);
+      } catch (err) {
+        console.error("Error fetching subjects:", err);
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+
+    fetchSubjects();
   }, []);
+
+  if (loading) {
+    return <div className="loading">Loading subjects...</div>;
+  }
+
+  if (error) {
+    return <div className="error">Error: {error}</div>;
+  }
 
   return (
     <div className="dashboard-page">
@@ -22,9 +50,9 @@ function Dashboard() {
       
       <div className="subject-cards">
         {subjects.map((subject) => (
-          <Link 
-            to={`/subject/${subject.id}`} 
-            key={subject.id} 
+          <Link
+            to={`/subject/${subject._id}`}
+            key={subject._id}
             className="subject-card"
           >
             <div className="subject-image">
