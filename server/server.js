@@ -14,7 +14,6 @@ const genAI = new GoogleGenerativeAI("AIzaSyDVDNBDVaY6QFXpOqh4wXySZf0-ATjQ0Sc");
 const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret_key'; // Use environment variable in production
 
 // Middleware
-
 app.use(cors());
 app.use(express.json());
 
@@ -24,7 +23,6 @@ mongoose.connect('mongodb://localhost:27017/auth_system', {
   useUnifiedTopology: true
 }).then(() => console.log('MongoDB connected'))
   .catch(err => console.error('MongoDB connection error:', err));
-
 
 // Create session schema for storing interview sessions
 const SessionSchema = new mongoose.Schema({
@@ -42,14 +40,14 @@ const SessionSchema = new mongoose.Schema({
     required: true
   },
   answers: {
-    type: Array, // Array of { questionId, answerText, evaluation }
+    type: Array, // Array of { questionId, answerText, evaluations: [], averageScore }
     default: []
   },
   createdAt: {
     type: Date,
     default: Date.now,
-    expires: 86400 // Automatically expire sessions after 24 hours
-}
+    expires: 86400 // Automatically expire sessions after 24 hours
+  }
 });
 
 // User Schema
@@ -75,8 +73,47 @@ const UserSchema = new mongoose.Schema({
   }
 });
 
+// Quiz Schema
+const QuizSchema = new mongoose.Schema({
+  quizId: {
+    type: String,
+    required: true,
+    unique: true
+  },
+  topic: {
+    type: String,
+    required: true
+  },
+  title: {
+    type: String,
+    required: true
+  },
+  questions: {
+    type: Array,
+    required: true
+  },
+  timeLimit: {
+    type: Number,
+    default: 10
+  },
+  passingScore: {
+    type: Number,
+    default: 70
+  },
+  createdBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now,
+    expires: 604800 // Expire after 7 days
+  }
+});
+
 const User = mongoose.model('User', UserSchema);
 const Session = mongoose.model('Session', SessionSchema);
+const Quiz = mongoose.model('Quiz', QuizSchema);
 
 // Validation middleware
 const registerValidation = [
@@ -199,8 +236,6 @@ app.post('/api/auth/login', loginValidation, async (req, res) => {
   }
 });
 
-
-
 // Auth middleware to protect routes
 const auth = (req, res, next) => {
   // Get token from header
@@ -220,42 +255,119 @@ const auth = (req, res, next) => {
     res.status(401).json({ msg: 'Token is not valid' });
   }
 };
-app.put('/api/user/update-name', auth, [
-    body('name').not().isEmpty().withMessage('Name is required')
-  ], async (req, res) => {
-    // Check for validation errors
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
-    }
+
+app.post("/api/generate-content", async (req, res) => {
+  const { topic, type } = req.body;
   
-    const { name } = req.body;
+  let prompt = `Generate content on ${topic}`;
   
-    try {
-      // Find user by ID (from auth middleware) and update
-      const user = await User.findByIdAndUpdate(
-        req.user.id,
-        { $set: { name } },
-        { new: true }
-      ).select('-password');
-  
-      if (!user) {
-        return res.status(404).json({ msg: 'User not found' });
+  if (type === "flashcards") {
+    prompt = `Generate 5 flashcards on ${topic} in JSON format. Each flashcard should have a "question" and an "answer". Example:
+    
+    {
+      "flashcards": [
+        { "question": "What is X?", "answer": "X is..." },
+        { "question": "Explain Y?", "answer": "Y is..." }
+      ]
+    }`;
+  } else if (type === "mindmap") {
+    prompt = `Generate a structured mind map for ${topic} in JSON format. Example:
+    {
+      "mindmap": {
+        "main_topic": "${topic}",
+        "subtopics": [
+          { "title": "Subtopic 1", "details": ["Point A", "Point B"] },
+          { "title": "Subtopic 2", "details": ["Point C", "Point D"] }
+        ]
       }
-  
-      res.json({
-        success: true,
-        user: {
-          id: user.id,
-          name: user.name,
-          email: user.email
-        }
-      });
-    } catch (err) {
-      console.error(err.message);
-      res.status(500).send('Server error');
+    }`;
+  } else if (type === "quiz") {
+    prompt = `Generate a quiz with 5 multiple-choice questions on ${topic} in JSON format. Each question should have 4 options with exactly one correct answer. Include an explanation for the correct answer. Format as follows:
+    
+    {
+      "quiz": {
+        "title": "Quiz on ${topic}",
+        "questions": [
+          {
+            "text": "Question 1?",
+            "options": ["Option A", "Option B", "Option C", "Option D"],
+            "correctAnswer": 0,
+            "explanation": "Explanation why Option A is correct..."
+          },
+          {
+            "text": "Question 2?",
+            "options": ["Option A", "Option B", "Option C", "Option D"],
+            "correctAnswer": 2,
+            "explanation": "Explanation why Option C is correct..."
+          }
+        ]
+      }
     }
-  });
+    
+    Make sure the questions are challenging but fair, and that the correctAnswer index (0-3) accurately points to the correct option.`;
+  }
+  
+  try {
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    let text = response.text();
+    
+    // Try to parse JSON if it's a structured content request
+    if (type === "flashcards" || type === "mindmap" || type === "quiz") {
+      try {
+        text = text.replace(/```json|```/g, "").trim();
+        text = JSON.parse(text);
+      } catch (error) {
+        console.error("Error parsing JSON:", error);
+        return res.status(500).json({ error: "Failed to generate structured output" });
+      }
+    }
+    
+    res.json({ data: text });
+  } catch (error) {
+    console.error("Error generating content:", error);
+    res.status(500).json({ error: "Failed to generate content" });
+  }
+});
+
+app.put('/api/user/update-name', auth, [
+  body('name').not().isEmpty().withMessage('Name is required')
+], async (req, res) => {
+  // Check for validation errors
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
+  const { name } = req.body;
+
+  try {
+    // Find user by ID (from auth middleware) and update
+    const user = await User.findByIdAndUpdate(
+      req.user.id,
+      { $set: { name } },
+      { new: true }
+    ).select('-password');
+
+    if (!user) {
+      return res.status(404).json({ msg: 'User not found' });
+    }
+
+    res.json({
+      success: true,
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email
+      }
+    });
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Server error');
+  }
+});
+
 // Protected route example
 app.get('/api/user', auth, async (req, res) => {
   try {
@@ -358,7 +470,6 @@ app.get('/api/interview/session/:sessionId', auth, async (req, res) => {
 async function generateInterviewQuestions(subject) {
   try {
     // Get the Gemini model
-    
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
     
     // Create prompt for generating interview questions
@@ -370,7 +481,6 @@ async function generateInterviewQuestions(subject) {
     Only respond with the JSON, no introductory or explanatory text.`;
     
     // Generate content
-    
     const result = await model.generateContent(prompt);
     const response = await result.response;
     const text = response.text();
@@ -411,232 +521,111 @@ async function generateInterviewQuestions(subject) {
     throw new Error('Failed to generate interview questions: ' + error.message);
   }
 }
-// Add this to your existing mongoose schemas
-const QuizSchema = new mongoose.Schema({
-  quizId: {
-    type: String,
-    required: true,
-    unique: true
-  },
-  topic: {
-    type: String,
-    required: true
-  },
-  questions: {
-    type: Array,
-    required: true
-  },
-  createdBy: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User'
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now,
-    expires: 604800 // Expire after 7 days
-  }
-});
 
-const Quiz = mongoose.model('Quiz', QuizSchema);
-
-// Quiz generation endpoint
-app.post('/api/quiz/generate', auth, async (req, res) => {
+// Quiz-related endpoints
+// Get quiz by topic ID
+app.get('/api/quizzes/topic/:topicId', async (req, res) => {
   try {
-    const { topic, numQuestions = 5, difficulty = 'mixed' } = req.body;
+    const { topicId } = req.params;
     
-    if (!topic) {
-      return res.status(400).json({ success: false, message: 'Topic is required' });
-    }
-    
-    // Generate quiz questions using Gemini API
-    let quizQuestions;
-    try {
-      quizQuestions = await generateQuizQuestions(topic, numQuestions, difficulty);
-    } catch (error) {
-      return res.status(500).json({
-        success: false,
-        message: 'Failed to generate quiz questions',
-        error: error.message
-      });
-    }
-    
-    // Create a new quiz
-    const quizId = 'quiz_' + require('crypto').randomBytes(16).toString('hex');
-    
-    // Store quiz in the database
-    const quiz = new Quiz({
-      quizId,
-      topic,
-      questions: quizQuestions,
-      createdBy: req.user.id
-    });
-    
-    await quiz.save();
-    
-    // Return the quiz data to the client
-    return res.status(200).json({
-      success: true,
-      message: 'Quiz generated successfully',
-      quiz: {
-        id: quizId,
-        topic,
-        questions: quizQuestions
-      }
-    });
-    
-  } catch (error) {
-    console.error('Error generating quiz:', error);
-    return res.status(500).json({
-      success: false,
-      message: 'Failed to generate quiz',
-      error: error.message
-    });
-  }
-});
-
-// Get a specific quiz
-app.get('/api/quiz/:quizId', auth, async (req, res) => {
-  try {
-    const quiz = await Quiz.findOne({ quizId: req.params.quizId });
+    // Find the most recent quiz for this topic
+    const quiz = await Quiz.findOne({ topic: topicId }).sort({ createdAt: -1 });
     
     if (!quiz) {
-      return res.status(404).json({
-        success: false,
-        message: 'Quiz not found'
+      return res.status(404).json({ 
+        success: false, 
+        message: 'No quiz found for this topic' 
       });
     }
     
-    return res.status(200).json({
+    res.json({
       success: true,
       quiz: {
-        id: quiz.quizId,
-        topic: quiz.topic,
+        id: quiz._id,
+        title: quiz.title,
         questions: quiz.questions,
-        createdAt: quiz.createdAt
+        timeLimit: quiz.timeLimit || 10,
+        passingScore: quiz.passingScore || 70
       }
     });
     
   } catch (error) {
-    console.error('Error retrieving quiz:', error);
-    return res.status(500).json({
-      success: false,
-      message: 'Failed to retrieve quiz',
-      error: error.message
+    console.error('Error fetching quiz:', error);
+    res.status(500).json({ 
+      success: false, 
+      error: 'Failed to load quiz' 
     });
   }
 });
-// Get a quiz by topic ID
-// Get a quiz by topic name (generate dynamically, don't fetch from DB)
-app.get('/api/quiz/by-topic/:topicName', auth, async (req, res) => {
+
+// Get specific quiz by ID
+app.get('/api/quizzes/:quizId', async (req, res) => {
   try {
-    const { topicName } = req.params;
+    const { quizId } = req.params;
     
-    // Generate quiz questions dynamically
-    const quizQuestions = await generateQuizQuestions(topicName, 5, 'mixed');
+    const quiz = await Quiz.findById(quizId);
     
-    return res.status(200).json({
+    if (!quiz) {
+      return res.status(404).json({ 
+        success: false, 
+        message: 'Quiz not found' 
+      });
+    }
+    
+    res.json({
       success: true,
       quiz: {
-        topic: topicName,
-        questions: quizQuestions
+        id: quiz._id,
+        title: quiz.title,
+        questions: quiz.questions,
+        timeLimit: quiz.timeLimit || 10,
+        passingScore: quiz.passingScore || 70
       }
     });
-
+    
   } catch (error) {
-    console.error('Error generating quiz by topic:', error);
-    return res.status(500).json({
-      success: false,
-      message: 'Failed to generate quiz',
-      error: error.message
+    console.error('Error fetching quiz:', error);
+    res.status(500).json({ 
+      success: false, 
+      error: 'Failed to load quiz' 
     });
   }
 });
 
-// Function to generate quiz questions using Gemini API
-async function generateQuizQuestions(topic, numQuestions = 5, difficulty = 'mixed') {
+// Create a new quiz
+app.post("/api/quizzes", async (req, res) => {
   try {
-    // Get the Gemini model
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const { topicId, quizData } = req.body;
     
-    // Create prompt for generating quiz questions with options
-    const prompt = `Generate ${numQuestions} multiple-choice quiz questions about ${topic} with difficulty level: ${difficulty}.
-    Format the response as a JSON array of objects, where each object has:
-    1. "id": a number
-    2. "question": the quiz question text
-    3. "options": an array of 4 possible answers
-    4. "correctAnswer": the index (0-3) of the correct answer in the options array
-    5. "explanation": a brief explanation of why the correct answer is right
-    6. "difficulty": an assessment of the question difficulty (easy, medium, hard)
-    Only respond with the JSON, no introductory or explanatory text.`;
-    
-    // Generate content
-    const result = await model.generateContent(prompt);
-    const response = await result.response;
-    const text = response.text();
-    
-    // Parse the JSON response with error handling
-    const cleanedText = text.replace(/```json|```/g, '').trim();
-    
-    try {
-      const questions = JSON.parse(cleanedText);
-      
-      // Validate the response structure
-      if (!Array.isArray(questions)) {
-        throw new Error('Response is not an array');
-      }
-      
-      // Ensure each question has the required fields
-      questions.forEach((q, index) => {
-        if (!q.id) q.id = index + 1;
-        if (!q.question) throw new Error(`Question at index ${index} is missing question text`);
-        if (!Array.isArray(q.options) || q.options.length !== 4) {
-          throw new Error(`Question at index ${index} has invalid options`);
-        }
-        if (q.correctAnswer === undefined || q.correctAnswer < 0 || q.correctAnswer > 3) {
-          throw new Error(`Question at index ${index} has invalid correctAnswer`);
-        }
-        if (!q.explanation) q.explanation = "No explanation provided.";
-        if (!q.difficulty) q.difficulty = 'medium';
-      });
-      
-      return questions;
-    } catch (parseError) {
-      console.error('Error parsing Gemini response:', parseError);
-      console.error('Received text:', cleanedText);
-      
-      // Fall back to default questions
-      return [
-        { 
-          id: 1, 
-          question: `What is a basic concept of ${topic}?`, 
-          options: ['Option A', 'Option B', 'Option C', 'Option D'],
-          correctAnswer: 0,
-          explanation: `This is a default question since we encountered an error generating questions about ${topic}.`,
-          difficulty: 'easy' 
-        },
-        { 
-          id: 2, 
-          question: `How does ${topic} work?`, 
-          options: ['Option A', 'Option B', 'Option C', 'Option D'],
-          correctAnswer: 1,
-          explanation: `This is a default question since we encountered an error generating questions about ${topic}.`,
-          difficulty: 'medium' 
-        },
-        { 
-          id: 3, 
-          question: `What is an advanced concept in ${topic}?`, 
-          options: ['Option A', 'Option B', 'Option C', 'Option D'],
-          correctAnswer: 2,
-          explanation: `This is a default question since we encountered an error generating questions about ${topic}.`,
-          difficulty: 'hard' 
-        }
-      ];
+    // Validate request
+    if (!topicId || !quizData || !quizData.quiz) {
+      return res.status(400).json({ success: false, error: "Missing required data" });
     }
+    
+    // Create new Quiz document
+    const newQuiz = new Quiz({
+      quizId: require('crypto').randomBytes(8).toString('hex'),
+      topic: topicId,
+      title: quizData.quiz.title,
+      questions: quizData.quiz.questions,
+      timeLimit: 10, // Default time limit
+      passingScore: 70 // Default passing score
+    });
+    
+    const savedQuiz = await newQuiz.save();
+    
+    res.status(201).json({
+      success: true,
+      message: "Quiz created successfully",
+      quizId: savedQuiz._id
+    });
+    
   } catch (error) {
-    console.error('Error generating questions with Gemini:', error);
-    throw new Error('Failed to generate quiz questions: ' + error.message);
+    console.error("Error saving quiz:", error);
+    res.status(500).json({ success: false, error: "Failed to save quiz" });
   }
-}
+});
+
 // Generate a cryptographically secure session ID
 function generateSessionId() {
   return 'sess_' + require('crypto').randomBytes(16).toString('hex');
