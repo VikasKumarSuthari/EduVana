@@ -23,3 +23,5 @@ dist/
 
 # Linux specific files
 *.swp
+
+README.md
