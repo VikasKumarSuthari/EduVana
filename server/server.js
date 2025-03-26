@@ -6,6 +6,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { body, validationResult } = require('express-validator');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
+const nodemailer = require('nodemailer');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -16,6 +17,13 @@ const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret_key'; // Use envir
 // Middleware
 app.use(cors());
 app.use(express.json());
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: 'mathiangelina0@gmail.com', 
+    pass: 'urodrptkoslvttfo'    
+  }
+});
 
 // Connect to MongoDB
 mongoose.connect('mongodb://localhost:27017/auth_system', {
@@ -115,6 +123,24 @@ const User = mongoose.model('User', UserSchema);
 const Session = mongoose.model('Session', SessionSchema);
 const Quiz = mongoose.model('Quiz', QuizSchema);
 
+
+
+const sendWelcomeEmail = async (email, name) => {
+  const mailOptions = {
+    from: 'mathiangelina0@gmail.com',
+    to: email,
+    subject: 'Welcome to EduVana!',
+    text: `Hello ${name},\n\nThank you for signing up with EduVana! We're excited to have you on board.\n\nBest,\nThe EduVana Team`
+  };
+
+  try {
+    await transporter.sendMail(mailOptions);
+    console.log('Welcome email sent successfully');
+  } catch (error) {
+    console.error('Error sending email:', error);
+  }
+};
+
 // Validation middleware
 const registerValidation = [
   body('name').not().isEmpty().withMessage('Name is required'),
@@ -161,6 +187,7 @@ app.post('/api/auth/register', registerValidation, async (req, res) => {
 
     // Save user to database
     await user.save();
+    await sendWelcomeEmail(email, name);
 
     // Create and return JWT
     const payload = {
